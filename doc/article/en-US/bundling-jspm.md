@@ -1,6 +1,6 @@
 ---
 {
-  "name": "Bundling Your App for Deploy",
+  "name": "Bundling with JSPM",
   "culture": "en-US",
   "description": "Before deploying your app to production, you'll want to bundle the assets for efficient use of the network.",
   "engines" : { "aurelia-doc" : "^1.0.0" },
@@ -33,9 +33,9 @@ To make this process efficient, we need to compress the assets and make fewer (p
 
 Bundling along with minification are techniques that can also be used to improve load time. Bundling and minification improve load time by reducing the number of requests to the server as well as reducing the size of requested assets such as views, view-models and CSS.
 
-## [Bundling an Aurelia Application](aurelia-doc://section/3/version/1.0.0)
+## [Bundling an Aurelia JSPM Application](aurelia-doc://section/3/version/1.0.0)
 
-We can  use [Aurelia Bundler](http://github.com/aurelia/bundler) to create a gulp task for bundling our app. Let's jump right into it. We will use the `skeleton-navigation` as our app to bundle. If you don't have that set up. Follow [these steps](https://github.com/aurelia/skeleton-navigation#running-the-app).
+We can  use [Aurelia Bundler](http://github.com/aurelia/bundler) to create a gulp task for bundling our JSPM app. Let's jump right into it. We will use the `skeleton-navigation` as our app to bundle. If you don't have that set up. Follow [these steps](https://github.com/aurelia/skeleton-navigation#running-the-app).
 
 Now that we have our app running, let's start by installing `aurelia-bundler`. To do so `cd` into `skeleton-navigation` and run the following command:
 
@@ -60,7 +60,7 @@ Now, let's create a `bundle.js` file in `build/tasks/bundle.js` as follows:
           includes: [
             '[*.js]',
             '*.html!text',
-            '*.css!text',        
+            '*.css!text'        
           ],
           options: {
             inject: true,
@@ -137,13 +137,13 @@ In a JSPM v0.17 style app, we have two separate config files: `jspm.browser.js` 
         './jspm.browser.js',
         './jspm.config.js'
       ],        
-      injectionConfigPath: './jspm.config.js'  // Configuration file path where bundle and depCache meta will be injected.
+      injectionConfigPath: './jspm.config.js',  // Configuration file path where bundle and depCache meta will be injected.
       bundles: {
         "dist/app-build": {     // bundle name/path. Must be within `baseURL`. Output path will look like: `baseURL/dist/app-build.js`.
           includes: [
             '[*.js]',
             '*.html!text',
-            '*.css!text',        
+            '*.css!text'        
           ],
           options: {
             inject: true,
@@ -183,7 +183,7 @@ Let us now take a closer look at the `config` object. We will skip `force` and `
         includes: [
           '[*.js]',
           '*.html!text',
-          '*.css!text',        
+          '*.css!text'        
         ],
   </source-code>
 </code-listing>
@@ -229,7 +229,7 @@ When the bundler analyzes this file it will find `aurelia-framework` and `aureli
         includes: [
           '*.js',
           '*.html!text',
-          '*.css!text',        
+          '*.css!text'        
         ],
   </source-code>
 </code-listing>
@@ -275,7 +275,7 @@ Here is a typical bundle configuration in all its glory:
 <code-listing heading="Excludes">
   <source-code lang="JavaScript">
     excludes : [
-       'app',
+       'app'
     ]
   </source-code>
 </code-listing>
@@ -332,7 +332,7 @@ With this little change Aurelia Loader will now use `HTML Imports` to load all t
       options: {
         inject: {
           indexFile : 'index.html',
-          destFile : 'dest_index.html',
+          destFile : 'dest_index.html'
         }
       }
     }

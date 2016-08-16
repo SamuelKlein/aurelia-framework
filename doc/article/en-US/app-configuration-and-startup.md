@@ -15,7 +15,7 @@
 ---
 ## [Bootstrapping Aurelia](aurelia-doc://section/1/version/1.0.0)
 
-Most platforms have a "main" or entry point for code execution. Aurelia is no different. If you've read the Getting Started Guide, then you've seen the `aurelia-app` attribute. Simply place this on an HTML element and Aurelia's bootstrapper will load an _app${context.language.fileExtension}_ and _app.html_, databind them together and inject them into the DOM element on which you placed that attribute.
+Most platforms have a "main" or entry point for code execution. Aurelia is no different. If you've read the Quick Start, then you've seen the `aurelia-app` attribute. Simply place this on an HTML element and Aurelia's bootstrapper will load an _app${context.language.fileExtension}_ and _app.html_, databind them together and inject them into the DOM element on which you placed that attribute.
 
 Often times you want to configure the framework or run some code prior to displaying anything to the user though. So chances are, as your project progresses, you will migrate towards needing some startup configuration. In order to do this, you can provide a value for the `aurelia-app` attribute that points to a configuration module. This module should export a single function named `configure`. Aurelia invokes your `configure` function, passing it the Aurelia object which you can then use to configure the framework yourself and decide what, when, and where to display your UI. Here's an example configuration file showing the standard configuration, the same configuration that is equivalent to what you would get when using `aurelia-app` without a value:
 
@@ -145,7 +145,21 @@ This causes the `my-root${context.language.fileExtension}`/`my-root.html` to be 
 
 ## [Bootstrapping Older Browsers](aurelia-doc://section/3/version/1.0.0)
 
-Aurelia was originally designed for Evergreen Browsers. This includes Chrome, Firefox, IE11 and Safari 8. However, we also support IE9 and above through the use of additional polyfills. To support these earlier browsers, you need the [requestAnimationFrame Polyfill](https://www.npmjs.com/package/raf) and the [MutationObserver polyfill](https://github.com/webcomponents/webcomponentsjs/tree/master/src). Once you have installed these, change your `index.html` startup code as follows:
+Aurelia was originally designed for Evergreen Browsers. This includes Chrome, Firefox, IE11 and Safari 8. However, we also support IE9 and above through the use of additional polyfills. To support these earlier browsers, you need the [requestAnimationFrame Polyfill](https://www.npmjs.com/package/raf) and the [MutationObserver polyfill](https://github.com/webcomponents/webcomponentsjs/tree/master/src). Once you have installed these, you'll need to adjust your code to load them before Aurelia is initialized.
+
+In case you are using Webpack, create a bootstrapper file, e.g. `bootstrapper.js`:
+
+<code-listing heading="Polyfill Configuration">
+  <source-code lang="HTML">
+    import 'webcomponents/webcomponentsjs/MutationObserver';
+    import * as raf from 'raf';
+    raf.polyfill();
+  </source-code>
+</code-listing>
+
+After you have created the file, add it as the first file in your `aurelia-bootstrapper` bundle. You can find bundle configuration in the `webpack.config.js` file.
+
+If you are using JSPM change your `index.html` startup code as follows:
 
 <code-listing heading="Polyfill Configuration">
   <source-code lang="HTML">
@@ -172,14 +186,17 @@ Aurelia was originally designed for Evergreen Browsers. This includes Chrome, Fi
   </source-code>
 </code-listing>
 
+> Note: Module Loaders and Bundlers
+> The code in this article demonstrates loading via SystemJS. However, these techniques can be accomplished with other module loaders just as readily. Be sure to lookup the appropriate APIs for your chosen loader or bundler in order to translate these samples into the required code for your own app.
+
 > Warning: Promises in Edge
 > Currently, the Edge browser has a serious performance problem with its Promise implementation. This deficiency can greatly increase startup time of your app. If you are targeting the Edge browser, it is highly recommended that you use the [bluebird promise](http://bluebirdjs.com/docs/getting-started.html) library to replace Edge's native implementation. You can do this by simply referencing the library prior to loading other libraries.
 
 ## [Manual Bootstrapping](aurelia-doc://section/4/version/1.0.0)
 
-So far, we've been bootstrapping our app declaratively by using the `aurelia-app` attribute. That's not the only way though. You can manually bootstrap the framework as well. Here's how you would change your HTML file to use manual bootstrapping:
+So far, we've been bootstrapping our app declaratively by using the `aurelia-app` attribute. That's not the only way though. You can manually bootstrap the framework as well. In case of JSPM, here's how you would change your HTML file to use manual bootstrapping:
 
-<code-listing heading="Manual Bootstrapping">
+<code-listing heading="Manual Bootstrapping with JSPM">
   <source-code lang="HTML">
     <!doctype html>
     <html>
@@ -202,6 +219,37 @@ So far, we've been bootstrapping our app declaratively by using the `aurelia-app
         </script>
       </body>
     </html>
+  </source-code>
+</code-listing>
+
+In case you use Webpack, you can replace the `aurelia-boostrapper-webpack` package with the `./src/main` entry file in the `aurelia-boostrapper` bundle defined inside of `webpack.config.js`, and call the boostrapper manually:
+
+
+<code-listing heading="Manual Bootstrapping with Webpack">
+  <source-code lang="ES 2015/2016">
+    import {bootstrap} from 'aurelia-bootstrapper-webpack';
+
+    bootstrap(async aurelia => {
+      aurelia.use
+        .standardConfiguration()
+        .developmentLogging();
+
+      await aurelia.start();
+      aurelia.setRoot('app', document.body);
+    });
+  </source-code>
+  <source-code lang="TypeScript">
+    import {Aurelia} from 'aurelia-framework';
+    import {bootstrap} from 'aurelia-bootstrapper-webpack';
+
+    bootstrap(async (aurelia: Aurelia) => {
+      aurelia.use
+        .standardConfiguration()
+        .developmentLogging();
+
+      await aurelia.start();
+      aurelia.setRoot('app', document.body);
+    });
   </source-code>
 </code-listing>
 
@@ -238,7 +286,7 @@ When you create a view in Aurelia, it is completely encapsulated. In the same wa
 
 ## [Organizing Your App with Features](aurelia-doc://section/6/version/1.0.0)
 
-Sometimes you have whole groups of components or related functionality that collectively form a "feature". This "feature" may even be owned by a particular set of developers on your team. You want these developers to be able to manage the configuration and resources of their own feature, without interfering with the other parts of the app. For this scenario, Aurelia provides the "feature" feature.
+Sometimes you have whole group of components or related functionality that collectively form a "feature". This "feature" may even be owned by a particular set of developers on your team. You want these developers to be able to manage the configuration and resources of their own feature, without interfering with the other parts of the app. For this scenario, Aurelia provides the "feature" feature.
 
 Imagine, as above, that we have a `my-component` component. Imagine that that was then one of a dozen components that formed a logical feature in your app called `my-feature`. Rather than place the feature's configuration logic inside the app's configuration module, we can place the feature's configuration inside its own feature configuration module.
 
@@ -327,7 +375,7 @@ So far you've seen Aurelia replacing a portion of the DOM with a root component.
 
 Imagine that you want to generate your home page on the server, including using your server-side templating engine to render out HTML. Perhaps you've got custom components you created with Aurelia, but you want to render the custom elements on the server with some content, in order to make things a bit more SEO friendly. Or perhaps you have an existing, traditional web app, that you want to incrementally start adding Aurelia to. When the HTML is rendered in the browser, you want to progressively enhance that HTML and "bring it to life" by activating all the Aurelia component's rich behavior.
 
-All this is possible with Aurelia, using a single method call: `enhance`. Instead of using `aurelia-app` let's use manual bootstrapping for this example. To progressively enhance the entire `body` of your HTML page, you can do something like this:
+All this is possible with Aurelia, using a single method call: `enhance`. Instead of using `aurelia-app` let's use manual bootstrapping for this example. To progressively enhance the entire `body` of your HTML page, you can do something like this (JSPM-based example):
 
 <code-listing heading="Progressive Enhancement">
   <source-code lang="HTML">
@@ -361,7 +409,7 @@ All this is possible with Aurelia, using a single method call: `enhance`. Instea
 
 It's important to note that, in order for `enhance` to identify components to enhance in your HTML page, you need to declare those components as global resources, as we have above with the `my-component` component.
 
-Optionally, you can provide an object instance to use as the data-binding context for the enhancement, or provide a specific part of the DOM to enhance. Here's an example that shows both:
+Optionally, you can provide an object instance to use as the data-binding context for the enhancement, or provide a specific part of the DOM to enhance. Here's an example that shows both (JSPM-based):
 
 <code-listing heading="Customized Progressive Enhancement">
   <source-code lang="HTML">
@@ -404,7 +452,7 @@ There are many things you may want to customize or configure as part of your app
 
 ### Configuring the View Location Convention
 
-Aureia uses a _View Strategy_ to locate the view that is associated with a particular component's view-model. If the component doesn't specify its own view strategy, then Aurelia's `ViewLocator` service will use a fallback view strategy. The fallback strategy that is used is named `ConventionalViewStrategy`. This strategy uses the view-model's module id to conventionally map to its view id. For example, if the module id is "welcome${context.language.fileExtension}" then this strategy will look for the view at "welcome.html". The conventional strategy's mapping logic can be changed if a different convention is desired. To do this, during bootstrap, import the `ViewLocator` and replace its `convertOriginToViewUrl` method with your own implementation. Here's some example code:
+Aurelia uses a _View Strategy_ to locate the view that is associated with a particular component's view-model. If the component doesn't specify its own view strategy, then Aurelia's `ViewLocator` service will use a fallback view strategy. The fallback strategy that is used is named `ConventionalViewStrategy`. This strategy uses the view-model's module id to conventionally map to its view id. For example, if the module id is "welcome${context.language.fileExtension}" then this strategy will look for the view at "welcome.html". The conventional strategy's mapping logic can be changed if a different convention is desired. To do this, during bootstrap, import the `ViewLocator` and replace its `convertOriginToViewUrl` method with your own implementation. Here's some example code:
 
 <code-listing heading="Custom View Location Convention">
   <source-code lang="ES 2015/2016">

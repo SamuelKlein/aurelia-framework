@@ -20,7 +20,7 @@ function preventActionlessFormSubmit() {
 
 export var Aurelia = function () {
   function Aurelia(loader, container, resources) {
-
+    
 
     this.loader = loader || new PLATFORM.Loader();
     this.container = container || new Container().makeGlobal();
@@ -74,7 +74,7 @@ export var Aurelia = function () {
       _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
       _this2.root.attached();
       _this2._onAureliaComposed();
-      return _this2;
+      resolve(_this2);
     });
   };
 
@@ -157,7 +157,8 @@ var extPattern = /\.[^/.]+$/;
 function runTasks(config, tasks) {
   var current = void 0;
   var next = function next() {
-    if (current = tasks.shift()) {
+    current = tasks.shift();
+    if (current) {
       return Promise.resolve(current(config)).then(next);
     }
 
@@ -263,7 +264,7 @@ var FrameworkConfiguration = function () {
   function FrameworkConfiguration(aurelia) {
     var _this4 = this;
 
-
+    
 
     this.aurelia = aurelia;
     this.container = aurelia.container;
@@ -322,7 +323,6 @@ var FrameworkConfiguration = function () {
 
     var toAdd = Array.isArray(resources) ? resources : arguments;
     var resource = void 0;
-    var path = void 0;
     var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
 
     for (var i = 0, ii = toAdd.length; i < ii; ++i) {
@@ -335,8 +335,8 @@ var FrameworkConfiguration = function () {
       var grandParent = resourcesRelativeTo[1];
       var name = resource;
 
-      if (resource.startsWith('./') && parent !== '') {
-        name = parent + resource.substr(1);
+      if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+        name = join(parent, resource);
       }
 
       this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
@@ -434,7 +434,8 @@ var FrameworkConfiguration = function () {
       var current = void 0;
 
       var next = function next() {
-        if (current = info.shift()) {
+        current = info.shift();
+        if (current) {
           return loadPlugin(_this7, loader, current).then(next);
         }
 

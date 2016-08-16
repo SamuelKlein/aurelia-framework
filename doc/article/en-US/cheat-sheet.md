@@ -1034,7 +1034,7 @@ The `params` object will have a property for each parameter of the route that wa
     }
   </source-code>
   <source-code lang="TypeScript">
-    import {Redirect, NavigationInstruction, RouterConfiguration} from 'aurelia-router';
+    import {Redirect, NavigationInstruction, RouterConfiguration, Next} from 'aurelia-router';
 
     export class App {
       configureRouter(config: RouterConfiguration): void {
@@ -1050,7 +1050,7 @@ The `params` object will have a property for each parameter of the route that wa
     }
 
     class AuthorizeStep {
-      run(navigationInstruction: NavigationInstruction, next: Function): Promise<any> {
+      run(navigationInstruction: NavigationInstruction, next: Next): Promise<any> {
         if (navigationInstruction.getAllInstructions().some(i => i.config.auth)) {
           var isLoggedIn = /* insert magic here */false;
           if (!isLoggedIn) {
@@ -1111,7 +1111,7 @@ Add [a base tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
 Since the VM's navigation life-cycle is called only once you may have problems recognizing that the user switched the route from `Product A` to `Product B` (see below).  To work around this issue implement the method `determineActivationStrategy` in your VM and return hints for the router about what you'd like to happen.
 
 > Info
-> Additionally, you can add an `activationStrategy` property to your route config if the strategy is always the same and you don't want that to be in your view-model code. Available values are `replace` and `invokeLifecycle`. Remember, "lifecycle" refers to the navigation lifecycle.
+> Additionally, you can add an `activationStrategy` property to your route config if the strategy is always the same and you don't want that to be in your view-model code. Available values are `replace` and `invoke-lifecycle`. Remember, "lifecycle" refers to the navigation lifecycle.
 
 <code-listing heading="Router VM Activation Control">
   <source-code lang="ES 2015/2016">

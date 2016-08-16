@@ -63,7 +63,7 @@ export let Aurelia = class Aurelia {
       this.root = engine.enhance({ container: this.container, element: this.host, resources: this.resources, bindingContext: bindingContext });
       this.root.attached();
       this._onAureliaComposed();
-      return this;
+      resolve(this);
     });
   }
 
@@ -137,7 +137,8 @@ const extPattern = /\.[^/.]+$/;
 function runTasks(config, tasks) {
   let current;
   let next = () => {
-    if (current = tasks.shift()) {
+    current = tasks.shift();
+    if (current) {
       return Promise.resolve(current(config)).then(next);
     }
 
@@ -288,7 +289,6 @@ export let FrameworkConfiguration = class FrameworkConfiguration {
 
     let toAdd = Array.isArray(resources) ? resources : arguments;
     let resource;
-    let path;
     let resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
 
     for (let i = 0, ii = toAdd.length; i < ii; ++i) {
@@ -301,8 +301,8 @@ export let FrameworkConfiguration = class FrameworkConfiguration {
       let grandParent = resourcesRelativeTo[1];
       let name = resource;
 
-      if (resource.startsWith('./') && parent !== '') {
-        name = parent + resource.substr(1);
+      if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+        name = join(parent, resource);
       }
 
       this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
@@ -394,7 +394,8 @@ export let FrameworkConfiguration = class FrameworkConfiguration {
       let current;
 
       let next = () => {
-        if (current = info.shift()) {
+        current = info.shift();
+        if (current) {
           return loadPlugin(this, loader, current).then(next);
         }
 

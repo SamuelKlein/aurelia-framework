@@ -1,4 +1,3 @@
-/*eslint no-unused-vars:0*/
 import * as TheLogManager from 'aurelia-logging';
 import {Container} from 'aurelia-dependency-injection';
 import {Loader} from 'aurelia-loader';
@@ -107,7 +106,7 @@ export class Aurelia {
       this.root = engine.enhance({container: this.container, element: this.host, resources: this.resources, bindingContext: bindingContext});
       this.root.attached();
       this._onAureliaComposed();
-      return this;
+      resolve(this);
     });
   }
 
